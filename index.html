@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>반려동물 나들이 앱 (수업 시연용)</title>
+<style>
+  body{margin:0;font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:#f6f7f4;color:#1f2a24}
+  header{background:#2f6f4f;color:#fff;padding:22px 20px}
+  header h1{margin:0;font-size:22px} header p{margin:6px 0 0;font-size:14px;opacity:.85}
+  .wrap{max-width:900px;margin:0 auto;padding:16px}
+  .bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .bar button{border:1px solid #2f6f4f;background:#fff;color:#2f6f4f;border-radius:999px;padding:6px 14px;font-size:14px;cursor:pointer}
+  .bar button.on{background:#2f6f4f;color:#fff}
+  input{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #cfd8d2;border-radius:8px;font-size:15px;margin-bottom:12px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+  .card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .card h3{margin:0 0 4px;font-size:17px} .tag{font-size:12px;color:#2f6f4f;font-weight:700}
+  .card p{margin:6px 0;font-size:13px;line-height:1.5;color:#46534c}
+  .card a{display:inline-block;margin:8px 6px 0 0;font-size:13px;padding:6px 10px;border-radius:8px;background:#eef5f0;color:#2f6f4f;text-decoration:none}
+  footer{text-align:center;font-size:12px;color:#7a857f;padding:20px}
+</style>
+</head>
+<body>
+<header><h1>🐾 반려동물 나들이 앱</h1><p>경기관광공사 반려동물 동반 관광정보 (2022.08.03) · 수업 시연용</p></header>
+<div class="wrap">
+  <div class="bar" id="bar"></div>
+  <input id="q" placeholder="업체명으로 검색">
+  <div class="cards" id="cards"></div>
+</div>
+<footer>출처: 공공데이터포털 · 경기관광공사_반려동물 동반 관광정보</footer>
+<script>
+const DATA = [{"지역명": "오산시", "업체명": "오산반려동물테마파크", "주소": "경기도 오산시 오산천로72", "전화번호": "", "이용시간": "내부 시설 09:00~18:00, 야외 운동장 6~9월 10:00~20:00, 10~5월 10:00~18:00 / 월요일, 1월 1일, 설·추석 당일 휴무", "홈페이지": "https://www.osan.go.kr/petpark/"}, {"지역명": "고양시", "업체명": "일산서구 반려동물공원", "주소": "경기도 고양시 일산서구 대화동 1993", "전화번호": "031-8075-4602", "이용시간": "상시개방", "홈페이지": ""}, {"지역명": "이천시", "업체명": "달려라 코코", "주소": "경기도 이천시 마장면 덕이로154번길 287-76 덕평자연휴게소 내", "전화번호": "031-645-0087", "이용시간": "힐링파크 10:00~19:00, 하절기(주말 및 공휴일) 10:00~20:00, 동절기 10:00~18:00, 인스타웨이 10:00~18:00, 런독스파크 11:00~18:00, 소형견 물놀이장(6~8월) 11:00~18:00 / 화요일 휴무", "홈페이지": "http://runkoko.com"}, {"지역명": "안성시", "업체명": "안성맞춤랜드", "주소": "경기도 안성시 보개면 남사당로 198", "전화번호": "031-678-2672", "이용시간": "상시개방", "홈페이지": "https://www.anseong.go.kr/tour/contents.do?mId=0103010100"}, {"지역명": "양평군", "업체명": "국립산음자연휴양림", "주소": "경기도 양평군 단월면 고북길 347", "전화번호": "031-774-8131", "이용시간": "숙박 4~10월 15:00~다음날 11:00(11~3월 미운영) / 일일 개장 09:00~18:00 / 화요일 휴무", "홈페이지": "https://www.foresttrip.go.kr/indvz/main.do?hmpgId=0103"}, {"지역명": "수원시", "업체명": "광교호수공원 반려견 놀이터", "주소": "경기도 수원시 영통구 하동 1008-9", "전화번호": "031-228-4192", "이용시간": "화~일요일 10:00~22:00 / 월요일 휴무 / 동절기 강설 및 우천 등으로 놀이터 운동장 이용이 어려울 경우 개장하지 않음", "홈페이지": ""}];
+let region = '전체';
+const bar = document.getElementById('bar'), cards = document.getElementById('cards'), q = document.getElementById('q');
+['전체', ...new Set(DATA.map(d => d['지역명']))].forEach(r => {
+  const b = document.createElement('button'); b.textContent = r;
+  b.onclick = () => { region = r; draw(); }; bar.appendChild(b);
+});
+function draw() {
+  [...bar.children].forEach(b => b.classList.toggle('on', b.textContent === region));
+  const k = q.value.trim();
+  cards.innerHTML = '';
+  DATA.filter(d => (region === '전체' || d['지역명'] === region) && d['업체명'].includes(k)).forEach(d => {
+    const c = document.createElement('div'); c.className = 'card';
+    const v = s => s || '정보 없음';
+    c.innerHTML = '<span class="tag">' + d['지역명'] + '</span><h3>' + d['업체명'] + '</h3>' +
+      '<p>📍 ' + v(d['주소']) + '</p><p>☎ ' + v(d['전화번호']) + '</p><p>🕒 ' + v(d['이용시간']) + '</p>' +
+      '<a target="_blank" href="https://map.kakao.com/link/search/' + encodeURIComponent(d['주소']) + '">지도에서 보기</a>' +
+      (d['홈페이지'] ? '<a target="_blank" href="' + d['홈페이지'] + '">홈페이지</a>' : '');
+    cards.appendChild(c);
+  });
+}
+q.oninput = draw; draw();
+</script>
+</body>
+</html>
